@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Algo especial está chegando... 🎈</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:      #f472b6;
+      --deep-pink: #db2777;
+      --blush:     #fce7f3;
+      --white:     #fff;
+      --gold:      #f9a8d4;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Lato', sans-serif;
+      background: linear-gradient(135deg, #fce7f3 0%, #fff 50%, #fce7f3 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Floating balloons */
+    .balloon {
+      position: fixed;
+      bottom: -120px;
+      width: 60px;
+      animation: floatUp linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .balloon svg { width: 100%; }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(-5deg); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(-110vh) rotate(5deg); opacity: 0; }
+    }
+
+    /* Confetti dots */
+    .dot {
+      position: fixed;
+      border-radius: 50%;
+      opacity: 0.25;
+      animation: drift linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes drift {
+      0%   { transform: translateY(-10px) rotate(0deg); }
+      100% { transform: translateY(100vh) rotate(360deg); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(244, 114, 182, 0.3);
+      border-radius: 28px;
+      padding: 52px 56px;
+      max-width: 560px;
+      width: 90%;
+      box-shadow: 0 8px 48px rgba(219, 39, 119, 0.12), 0 2px 8px rgba(219,39,119,0.06);
+      animation: fadeIn 1s ease both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .emoji-top { font-size: 3rem; margin-bottom: 16px; display: block; animation: bounce 2s ease infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      color: var(--deep-pink);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: #be185d;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      opacity: 0.7;
+    }
+
+    /* Countdown boxes */
+    .countdown {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 72px;
+    }
+    .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--deep-pink);
+      line-height: 1;
+      background: var(--blush);
+      border-radius: 14px;
+      padding: 10px 18px;
+      min-width: 80px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .num.tick { transform: scale(1.08); }
+    .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-top: 6px;
+    }
+    .sep {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      color: var(--pink);
+      align-self: flex-start;
+      margin-top: 10px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* Present button */
+    .btn-present {
+      display: none;
+      padding: 18px 48px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #fff;
+      background: linear-gradient(135deg, var(--pink), var(--deep-pink));
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(219,39,119,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      margin-top: 8px;
+    }
+    .btn-present:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(219,39,119,0.45);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 20px;
+      font-size: 0.75rem;
+      color: #f9a8d4;
+      letter-spacing: 0.05em;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Balloons & dots injected by JS -->
+
+  <div class="card">
+    <span class="emoji-top">🎈</span>
+    <h1>Algo especial está chegando</h1>
+    <p class="subtitle">para a pessoa mais especial do mundo</p>
+
+    <div class="countdown" id="countdown">
+      <div class="box"><span class="num" id="days">00</span><span class="label">dias</span></div>
+      <div class="sep">:</div>
+      <div class="box"><span class="num" id="hours">00</span><span class="label">horas</span></div>
+      <div class="sep">:</div>
+      <div class="box"><span class="num" id="mins">00</span><span class="label">minutos</span></div>
+      <div class="sep">:</div>
+      <div class="box"><span class="num" id="secs">00</span><span class="label">segundos</span></div>
+    </div>
+
+    <a href="login.html" class="btn-present" id="btnPresent">🎁 Abrir meu presente</a>
+  </div>
+
+  <footer>feito com 💗 só pra você</footer>
+
+<script>
+  // ════════════════════════════════════════
+  //  ⚠️  ALTERE AQUI a data do aniversário
+  //     Formato: 'AAAA-MM-DDTHH:MM:SS'
+  const TARGET = new Date('2025-12-31T00:00:00');
+  // ════════════════════════════════════════
+
+  const pad = n => String(n).padStart(2, '0');
+
+  function tick() {
+    const diff = TARGET - new Date();
+    if (diff <= 0) {
+      document.getElementById('countdown').style.display = 'none';
+      document.getElementById('btnPresent').style.display = 'inline-block';
+      clearInterval(timer);
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    ['days','hours','mins','secs'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      const val = [d, h, m, s][i];
+      if (el.textContent !== pad(val)) {
+        el.textContent = pad(val);
+        el.classList.add('tick');
+        setTimeout(() => el.classList.remove('tick'), 200);
+      }
+    });
+  }
+
+  const timer = setInterval(tick, 1000);
+  tick();
+
+  // ── Balloons ──
+  const colors = ['#f472b6','#fb7185','#e879f9','#a78bfa','#f9a8d4'];
+  for (let i = 0; i < 7; i++) {
+    const b = document.createElement('div');
+    b.className = 'balloon';
+    b.style.left = (10 + i * 13) + '%';
+    b.style.animationDuration = (8 + Math.random() * 8) + 's';
+    b.style.animationDelay = (Math.random() * 8) + 's';
+    const c = colors[i % colors.length];
+    b.innerHTML = `<svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="30" cy="30" rx="28" ry="30" fill="${c}" opacity="0.85"/>
+      <line x1="30" y1="60" x2="30" y2="80" stroke="${c}" stroke-width="2"/>
+    </svg>`;
+    document.body.appendChild(b);
+  }
+
+  // ── Floating dots ──
+  for (let i = 0; i < 18; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    const size = 6 + Math.random() * 10;
+    d.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*10}s`;
+    document.body.appendChild(d);
+  }
+</script>
+</body>
+</html>

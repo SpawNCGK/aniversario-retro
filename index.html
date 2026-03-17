@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aniversário da Larissa v1.0</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #008080;
+  --face:    #c0c0c0;
+  --dark:    #808080;
+  --darker:  #404040;
+  --light:   #ffffff;
+  --navy:    #000080;
+  --black:   #000000;
+  --green:   #00ff00;
+  --purple:  #800080;
+  --pink:    #ff69b4;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'MS Sans Serif', 'Courier New', monospace;
+  font-size: 11px;
+  background: var(--bg);
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+
+/* ── DESKTOP ── */
+#desktop {
+  width: 100vw;
+  height: calc(100vh - 32px);
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg);
+}
+#desktop::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(transparent 0px, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── DESKTOP ICONS ── */
+.desktop-icons {
+  position: absolute;
+  top: 10px; left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 70px;
+  cursor: pointer;
+  padding: 4px;
+  border: 1px solid transparent;
+}
+.icon:hover { border: 1px dotted white; background: rgba(0,0,128,0.3); }
+.icon-img { font-size: 34px; line-height: 1; }
+.icon-label {
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  text-shadow: 1px 1px 2px black, -1px -1px 2px black;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* ── WIN95 WINDOW ── */
+.w95 {
+  position: absolute;
+  background: var(--face);
+  border-top:    2px solid var(--light);
+  border-left:   2px solid var(--light);
+  border-right:  2px solid var(--darker);
+  border-bottom: 2px solid var(--darker);
+  box-shadow: 2px 2px 0 var(--black);
+}
+
+/* Title bar */
+.tbar {
+  background: linear-gradient(90deg, var(--navy) 0%, #1084d0 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 2px 3px;
+  gap: 4px;
+  height: 22px;
+}
+.tbar-icon { font-size: 14px; }
+.tbar-text { flex: 1; font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tbar-btns { display: flex; gap: 2px; }
+.tbtn {
+  width: 16px; height: 14px;
+  background: var(--face);
+  border-top: 1px solid var(--light); border-left: 1px solid var(--light);
+  border-right: 1px solid var(--dark); border-bottom: 1px solid var(--dark);
+  font-size: 9px; line-height: 14px; text-align: center;
+  cursor: pointer; color: black; font-weight: bold;
+}
+.tbtn:active {
+  border-top: 1px solid var(--dark); border-left: 1px solid var(--dark);
+  border-right: 1px solid var(--light); border-bottom: 1px solid var(--light);
+}
+
+/* Menu bar */
+.mbar {
+  background: var(--face);
+  display: flex;
+  padding: 1px 4px;
+  border-bottom: 1px solid var(--dark);
+}
+.mitem { padding: 2px 8px; font-size: 11px; cursor: pointer; }
+.mitem:hover { background: var(--navy); color: white; }
+
+/* ── MAIN WINDOW — Countdown ── */
+#mainWin {
+  /* Lower position so desktop icons are visible above */
+  top: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(600px, 96vw);
+  z-index: 10;
+}
+
+/* LED display */
+.led {
+  background: #050505;
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+  padding: 16px 18px;
+  text-align: center;
+  margin: 8px;
+}
+.led-num {
+  font-family: 'VT323', monospace;
+  font-size: clamp(1.8rem, 5.5vw, 3.2rem);
+  color: var(--green);
+  text-shadow: 0 0 10px #00ff0077, 0 0 3px #00ff00;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+}
+.led-sub { font-size: 10px; color: #005500; letter-spacing: 0.18em; margin-top: 4px; text-transform: uppercase; }
+
+/* Present button — hidden until countdown ends */
+#presentBtn {
+  display: none;
+  margin: 0 auto 8px;
+  padding: 5px 22px;
+  background: var(--face);
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  color: var(--purple);
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+  cursor: pointer;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+
+/* ── LOGIN SUB-WINDOW (inside main window) ── */
+#loginSubWin {
+  display: none;
+  margin: 8px 8px 10px;
+  background: var(--face);
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+}
+
+.login-sub-body {
+  padding: 10px 12px 12px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+/* Under Construction icon column */
+.under-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 6px;
+  min-width: 54px;
+}
+.under-sign {
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(1px 1px 0 #555);
+}
+.under-txt {
+  font-size: 8px;
+  font-weight: bold;
+  text-align: center;
+  color: #444;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+}
+
+/* Form column */
+.login-form-col { flex: 1; }
+
+.lfield { margin-bottom: 8px; }
+.lfield label {
+  display: block;
+  font-size: 11px;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 3px;
+}
+.lfield input {
+  width: 100%;
+  padding: 3px 5px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: white; color: black;
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+  outline: none;
+}
+.lfield input:focus { outline: 1px dotted black; outline-offset: -2px; }
+
+/* Big LOGIN button column */
+.login-btn-col {
+  display: flex;
+  align-items: center;
+  padding-top: 14px;
+}
+.btn-login-big {
+  padding: 10px 18px;
+  background: var(--face);
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: bold;
+  color: black;
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.btn-login-big:active {
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+  padding: 11px 17px 9px 19px;
+}
+
+.win-btn {
+  padding: 4px 20px;
+  background: var(--face);
+  font-family: 'Courier New', monospace;
+  font-size: 12px; font-weight: bold;
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+  cursor: pointer;
+}
+.win-btn:active {
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+  padding: 5px 19px 3px 21px;
+}
+
+/* Error dialog */
+#errDialog {
+  display: none;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(300px, 92vw);
+  z-index: 700;
+}
+.err-body { padding: 16px; display: flex; gap: 12px; align-items: flex-start; }
+.err-icon { font-size: 26px; }
+.err-txt { font-size: 12px; line-height: 1.7; }
+.err-btns { padding: 8px; display: flex; justify-content: center; }
+
+/* ── BIRTHDAY WINDOW ── */
+#bdayWin {
+  display: none;
+  top: 20px; left: 50%;
+  transform: translateX(-50%);
+  width: min(700px, 96vw);
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  z-index: 200;
+}
+#bdayWin::-webkit-scrollbar { width: 16px; }
+#bdayWin::-webkit-scrollbar-track { background: var(--face); border-left: 1px solid var(--dark); }
+#bdayWin::-webkit-scrollbar-thumb {
+  background: var(--face);
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+}
+
+.bday-hero {
+  background: black;
+  padding: 14px;
+  text-align: center;
+  overflow: hidden;
+  border-bottom: 2px solid var(--dark);
+}
+.marquee-txt {
+  font-family: 'VT323', monospace;
+  font-size: 2rem;
+  color: var(--pink);
+  text-shadow: 2px 2px 0 var(--purple);
+  white-space: nowrap;
+  animation: scroll-left 10s linear infinite;
+}
+@keyframes scroll-left { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+.bday-blink {
+  font-family: 'VT323', monospace;
+  color: #ffff00;
+  font-size: 1.1rem;
+  margin-top: 4px;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50%{opacity:0} }
+
+/* Gallery */
+.gal-wrap { margin: 6px 8px; }
+.gal-title { background: var(--navy); color: white; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+.gal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 3px; padding: 6px;
+  background: white;
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+}
+.thumb {
+  aspect-ratio: 1;
+  background: var(--face);
+  border: 1px solid var(--dark);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer;
+  font-size: 28px; overflow: hidden;
+}
+.thumb:hover { background: var(--navy); color: white; outline: 1px dotted white; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb span { font-size: 9px; text-align: center; padding: 2px; pointer-events: none; }
+
+/* Notepad letter */
+.notepad { margin: 6px 8px; }
+.notepad-bar {
+  background: var(--face);
+  border-bottom: 1px solid var(--dark);
+  padding: 2px 6px;
+  display: flex; gap: 4px; align-items: center;
+}
+.nbtn {
+  padding: 1px 5px; font-size: 11px; font-weight: bold;
+  border-top: 1px solid var(--light); border-left: 1px solid var(--light);
+  border-right: 1px solid var(--dark); border-bottom: 1px solid var(--dark);
+  cursor: pointer;
+}
+#letterBody {
+  background: white;
+  padding: 14px 16px;
+  font-family: 'Times New Roman', serif;
+  font-size: 13px;
+  line-height: 1.9;
+  color: black;
+  min-height: 140px;
+  white-space: pre-wrap;
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+}
+
+/* Confetti */
+.party-wrap {
+  margin: 6px 8px 8px;
+  padding: 12px;
+  text-align: center;
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+}
+.party-title { font-family: 'VT323', monospace; font-size: 1.4rem; color: var(--purple); margin-bottom: 8px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.pbtn {
+  padding: 4px 14px; background: var(--face); font-size: 11px; font-weight: bold;
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+  cursor: pointer; font-family: 'Courier New', monospace;
+}
+.pbtn:active {
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+}
+
+/* ── TASKBAR ── */
+#taskbar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 32px;
+  background: var(--face);
+  border-top: 2px solid var(--light);
+  display: flex; align-items: center;
+  padding: 0 4px; gap: 4px;
+  z-index: 9000;
+}
+#startBtn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px; font-size: 12px; font-weight: bold;
+  background: var(--face); cursor: pointer;
+  border-top: 2px solid var(--light); border-left: 2px solid var(--light);
+  border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+}
+#startBtn:active {
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+}
+.tb-sep { width: 2px; height: 22px; border-left: 1px solid var(--darker); border-right: 1px solid var(--light); margin: 0 2px; }
+.tb-item {
+  display: flex; align-items: center; gap: 4px;
+  padding: 2px 8px; font-size: 11px;
+  background: var(--face); cursor: pointer;
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+  max-width: 200px; overflow: hidden; white-space: nowrap;
+}
+.tb-right {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  padding: 2px 8px;
+  border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
+  border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+  font-family: 'Courier New', monospace; font-size: 11px;
+}
+
+@media(max-width:480px){
+  .led-num { font-size: 1.3rem; }
+  #mainWin { top: 140px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ DESKTOP ═══════════ -->
+<div id="desktop">
+
+  <!-- Desktop Icons — visible above the window -->
+  <div class="desktop-icons">
+    <div class="icon" ondblclick="focusMain()">
+      <div class="icon-img">🖥️</div>
+      <div class="icon-label">Meu Computador</div>
+    </div>
+    <div class="icon">
+      <div class="icon-img">🗑️</div>
+      <div class="icon-label">Lixeira</div>
+    </div>
+    <div class="icon">
+      <div class="icon-img">📁</div>
+      <div class="icon-label">Meus Documentos</div>
+    </div>
+    <div class="icon" ondblclick="focusMain()">
+      <div class="icon-img">🎂</div>
+      <div class="icon-label">Aniversário da Lari</div>
+    </div>
+    <div class="icon">
+      <div class="icon-img">🌐</div>
+      <div class="icon-label">Internet Explorer</div>
+    </div>
+  </div>
+
+  <!-- Corner decoration -->
+  <div style="position:absolute;bottom:44px;right:16px;font-size:28px;pointer-events:none;animation:fh 2s ease-in-out infinite">💗</div>
+  <style>@keyframes fh{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}</style>
+
+  <!-- ═══ MAIN WINDOW — Countdown ═══ -->
+  <div class="w95" id="mainWin">
+    <div class="tbar">
+      <span class="tbar-icon">🎂</span>
+      <span class="tbar-text">Aniversário da Larissa v1.0</span>
+      <div class="tbar-btns">
+        <div class="tbtn">_</div>
+        <div class="tbtn">□</div>
+        <div class="tbtn" onclick="document.getElementById('mainWin').style.display='none'">✕</div>
+      </div>
+    </div>
+    <div class="mbar">
+      <div class="mitem">File</div>
+      <div class="mitem">Edit</div>
+      <div class="mitem">Help</div>
+    </div>
+
+    <div style="padding:8px 8px 10px">
+      <div style="font-family:'VT323',monospace;font-size:1.15rem;text-align:center;
+                  color:var(--black);margin-bottom:6px;letter-spacing:0.03em">
+        Contagem regressiva para o TRINTOU DA LARI
+      </div>
+
+      <div class="led">
+        <div class="led-num" id="ledNum">CARREGANDO...</div>
+        <div class="led-sub" id="ledSub">dias &nbsp;·&nbsp; horas &nbsp;·&nbsp; minutos &nbsp;·&nbsp; segundos</div>
+      </div>
+
+      <!-- Present button — only visible when countdown = 0 -->
+      <div style="text-align:center" id="presentBtnWrap">
+        <button class="win-btn" id="presentBtn" onclick="openLogin()">
+          🎁 ABRIR MEU PRESENTE
+        </button>
+      </div>
+    </div>
+
+    <!-- LOGIN SUB-WINDOW — appears inside main window when countdown ends -->
+    <div id="loginSubWin">
+      <!-- Sub-window title bar -->
+      <div class="tbar">
+        <span class="tbar-icon">🔒</span>
+        <span class="tbar-text">ACESSAR MEMÓRIAS SECRETAS</span>
+        <div class="tbar-btns">
+          <div class="tbtn">✕</div>
+        </div>
+      </div>
+
+      <div class="login-sub-body">
+        <!-- Under Construction icon -->
+        <div class="under-col">
+          <div class="under-sign">🚧</div>
+          <div class="under-txt">UNDER<br>CONSTRUCTION</div>
+        </div>
+
+        <!-- Form fields -->
+        <div class="login-form-col">
+          <div class="lfield">
+            <label>CPF (Somente números):</label>
+            <input type="text" id="cpfInput" maxlength="11" inputmode="numeric" autocomplete="off"/>
+          </div>
+          <div class="lfield">
+            <label>SENHA (Data de Namoro DD/MM/AAAA):</label>
+            <input type="password" id="senhaInput"/>
+          </div>
+        </div>
+
+        <!-- Big LOGIN button -->
+        <div class="login-btn-col">
+          <button class="btn-login-big" onclick="doLogin()">LOGIN 🔐</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mainWin -->
+
+  <!-- ═══ ERROR DIALOG ═══ -->
+  <div class="w95" id="errDialog">
+    <div class="tbar" style="background:linear-gradient(90deg,#800000,#c0392b)">
+      <span class="tbar-icon">⛔</span>
+      <span class="tbar-text">Erro do Sistema</span>
+      <div class="tbar-btns">
+        <div class="tbtn" onclick="document.getElementById('errDialog').style.display='none'">✕</div>
+      </div>
+    </div>
+    <div class="err-body">
+      <span class="err-icon">💔</span>
+      <div class="err-txt">
+        Ops, essa chave não abre<br>esse coração!<br>
+        <span style="color:var(--dark);font-size:10px">Tente novamente, meu amor…</span>
+      </div>
+    </div>
+    <div class="err-btns">
+      <button class="win-btn" onclick="document.getElementById('errDialog').style.display='none'">OK</button>
+    </div>
+  </div>
+
+  <!-- ═══ BIRTHDAY WINDOW ═══ -->
+  <div class="w95" id="bdayWin">
+    <div class="tbar">
+      <span class="tbar-icon">🎉</span>
+      <span class="tbar-text">Feliz Aniversário, Larissa! — Memórias Secretas</span>
+      <div class="tbar-btns">
+        <div class="tbtn">_</div>
+        <div class="tbtn">□</div>
+        <div class="tbtn" onclick="document.getElementById('bdayWin').style.display='none'">✕</div>
+      </div>
+    </div>
+    <div class="mbar">
+      <div class="mitem">Arquivo</div>
+      <div class="mitem">Editar</div>
+      <div class="mitem">Visualizar</div>
+      <div class="mitem">Ajuda ❤️</div>
+    </div>
+
+    <div class="bday-hero">
+      <div class="marquee-txt">🎂 FELIZ ANIVERSÁRIO, LARISSA! — TRINTOU DA LARI! 🎂 — COM TODO MEU AMOR — 🎈🎊💗🌟</div>
+      <div class="bday-blink">*** VOCÊ É A PESSOA MAIS ESPECIAL DO MUNDO ***</div>
+    </div>
+
+    <div class="gal-wrap">
+      <div class="gal-title">📸 C:\Nossos Momentos\ — 6 objetos</div>
+      <div class="gal-grid" id="photoGrid"></div>
+    </div>
+
+    <div class="notepad">
+      <div class="tbar">
+        <span class="tbar-icon">📝</span>
+        <span class="tbar-text">Carta de amor — Notepad.exe</span>
+        <div class="tbar-btns"><div class="tbtn">_</div><div class="tbtn">□</div><div class="tbtn">✕</div></div>
+      </div>
+      <div class="notepad-bar">
+        <span class="nbtn">B</span><span class="nbtn"><i>I</i></span><span class="nbtn"><u>U</u></span>
+      </div>
+      <div id="letterBody"></div>
+    </div>
+
+    <div class="party-wrap">
+      <div class="party-title">🎊 HORA DA FESTA! 🎊</div>
+      <div class="btn-row">
+        <button class="pbtn" onclick="boom('hearts')">💗 Corações!</button>
+        <button class="pbtn" onclick="boom('stars')">⭐ Estrelas!</button>
+        <button class="pbtn" onclick="boom('rainbow')">🌈 Arco-íris!</button>
+        <button class="pbtn" onclick="boom('all')">🎉 TUDO!</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /desktop -->
+
+<!-- ═══════════ TASKBAR ═══════════ -->
+<div id="taskbar">
+  <button id="startBtn">
+    <span>🪟</span><strong>Start</strong>
+  </button>
+  <div class="tb-sep"></div>
+  <div class="tb-item" onclick="focusMain()">
+    🎂 <span>Aniversário da Larissa</span>
+  </div>
+  <div class="tb-right">
+    🔊 &nbsp;<span id="clock">00:00</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script>
+// ════════════════════════════════════
+//  CONFIG — edite aqui
+// ════════════════════════════════════
+const TARGET   = new Date('2026-03-19T00:00:00');
+const CPF_OK   = '45174836818';   // somente números
+const SENHA_OK = '26/10/2025';
+
+const PHOTOS = [
+  { emoji:'🌟', label:'Nossa primeira vez' },
+  { emoji:'✈️', label:'Viagem inesquecível' },
+  { emoji:'😊', label:'Dia de sorriso' },
+  { emoji:'🌸', label:'Felicidade simples' },
+  { emoji:'🤝', label:'Cumplicidade' },
+  { emoji:'💗', label:'Amor de todo dia' },
+  // Para fotos reais: { src:'foto1.jpg', label:'...' }
+];
+
+const LETTER =
+`Larissa,
+
+Hoje é o seu dia. E eu quero que você saiba que você é a coisa mais bonita que aconteceu na minha vida.
+
+Cada momento ao seu lado é um arquivo que eu salvo no coração com cuidado infinito — cada risada, cada olhar, cada silêncio compartilhado.
+
+Você me faz querer ser melhor. Você me faz enxergar beleza nas coisas mais simples. E você faz qualquer lugar parecer lar.
+
+Feliz aniversário, meu amor. Que esse novo ciclo seja cheio de coisas incríveis — porque você merece tudo que esse mundo tem de melhor.
+
+Te amo hoje, amanhã e em todos os aniversários que ainda vamos celebrar juntos.`;
+// ════════════════════════════════════
+
+// Clock
+function updateClock() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Countdown
+const pad = n => String(n).padStart(2,'0');
+let done = false;
+
+function tick() {
+  if (done) return;
+  const diff = TARGET - new Date();
+  if (diff <= 0) {
+    done = true;
+    document.getElementById('ledNum').textContent = '🎂  CHEGOU O DIA!  🎂';
+    document.getElementById('ledSub').textContent = 'O TRINTOU DA LARI CHEGOU!';
+    // Hide present button, show login sub-window directly
+    document.getElementById('presentBtnWrap').style.display = 'none';
+    document.getElementById('loginSubWin').style.display = 'block';
+    setTimeout(() => document.getElementById('cpfInput').focus(), 100);
+    clearInterval(timer);
+    boom('all');
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('ledNum').textContent =
+    `${pad(d)} DIAS,  ${pad(h)} HORAS,  ${pad(m)} MIN,  ${pad(s)} SEG`;
+}
+const timer = setInterval(tick, 1000);
+tick();
+
+// Focus / reopen main window
+function focusMain() {
+  document.getElementById('mainWin').style.display = 'block';
+}
+
+// openLogin kept for present button (won't be used since counter zeroes first)
+function openLogin() {
+  document.getElementById('presentBtnWrap').style.display = 'none';
+  document.getElementById('loginSubWin').style.display = 'block';
+  setTimeout(() => document.getElementById('cpfInput').focus(), 50);
+}
+
+function doLogin() {
+  const cpf   = document.getElementById('cpfInput').value.replace(/\D/g,'');
+  const senha = document.getElementById('senhaInput').value.trim();
+  if (cpf === CPF_OK && senha === SENHA_OK) {
+    window.location.href = 'surpresa.html';
+  } else {
+    document.getElementById('errDialog').style.display = 'block';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// Birthday
+let builtPhotos = false, startedTyping = false;
+function openBirthday() {
+  document.getElementById('bdayWin').style.display = 'block';
+  if (!builtPhotos) { buildPhotos(); builtPhotos = true; }
+  if (!startedTyping) { startTyping(); startedTyping = true; }
+  boom('all');
+}
+
+function buildPhotos() {
+  const grid = document.getElementById('photoGrid');
+  PHOTOS.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'thumb';
+    d.innerHTML = p.src
+      ? `<img src="${p.src}" alt="${p.label}"/>`
+      : `${p.emoji}<span>${p.label}</span>`;
+    d.onclick = () => boom();
+    grid.appendChild(d);
+  });
+}
+
+function startTyping() {
+  const el = document.getElementById('letterBody');
+  let i = 0;
+  function step() {
+    if (i > LETTER.length) return;
+    el.innerHTML = LETTER.slice(0,i).replace(/\n/g,'<br>') +
+      '<span style="border-right:2px solid black;animation:blink 0.7s step-end infinite">&nbsp;</span>';
+    i++;
+    setTimeout(step, i < 40 ? 30 : 18);
+  }
+  step();
+}
+
+// Confetti
+function boom(type) {
+  const o = { particleCount:100, spread:80, origin:{y:0.6} };
+  if (type==='hearts')
+    confetti({...o, shapes:['heart'], colors:['#ff69b4','#db2777','#fce7f3']});
+  else if (type==='stars')
+    confetti({...o, shapes:['star'], colors:['#f59e0b','#fbbf24','#fff']});
+  else if (type==='rainbow')
+    ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899']
+      .forEach((c,i)=>setTimeout(()=>confetti({particleCount:16,spread:60,origin:{y:0.6},colors:[c]}),i*80));
+  else {
+    confetti({...o, colors:['#ff69b4','#800080','#ffff00','#00ff00','#00bfff']});
+    setTimeout(()=>confetti({...o,angle:60,origin:{x:0,y:0.7}}),250);
+    setTimeout(()=>confetti({...o,angle:120,origin:{x:1,y:0.7}}),500);
+  }
+}
+</script>
+</body>
+</html>
