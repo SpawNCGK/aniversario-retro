@@ -169,49 +169,29 @@ html, body {
 }
 @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
 
-/* ── LOGIN SUB-WINDOW (inside main window) ── */
-#loginSubWin {
+/* ── LOGIN MODAL — floating Win95 dialog (matches photo) ── */
+#loginModal {
   display: none;
-  margin: 8px 8px 10px;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(380px, 94vw);
+  z-index: 600;
   background: var(--face);
   border-top: 2px solid var(--light); border-left: 2px solid var(--light);
   border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
+  box-shadow: 4px 4px 0 black;
 }
 
-.login-sub-body {
-  padding: 10px 12px 12px;
+.lm-body {
+  padding: 12px 14px 14px;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-}
-
-/* Under Construction icon column */
-.under-col {
-  display: flex;
-  flex-direction: column;
+  gap: 12px;
   align-items: center;
-  gap: 4px;
-  padding-top: 6px;
-  min-width: 54px;
 }
-.under-sign {
-  font-size: 38px;
-  line-height: 1;
-  filter: drop-shadow(1px 1px 0 #555);
-}
-.under-txt {
-  font-size: 8px;
-  font-weight: bold;
-  text-align: center;
-  color: #444;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
-}
-
-/* Form column */
-.login-form-col { flex: 1; }
-
-.lfield { margin-bottom: 8px; }
+.lm-fields { flex: 1; }
+.lfield { margin-bottom: 10px; }
+.lfield:last-child { margin-bottom: 0; }
 .lfield label {
   display: block;
   font-size: 11px;
@@ -231,29 +211,31 @@ html, body {
 }
 .lfield input:focus { outline: 1px dotted black; outline-offset: -2px; }
 
-/* Big LOGIN button column */
-.login-btn-col {
-  display: flex;
-  align-items: center;
-  padding-top: 14px;
-}
 .btn-login-big {
-  padding: 10px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 16px;
   background: var(--face);
   font-family: 'Courier New', monospace;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: bold;
   color: black;
   border-top: 2px solid var(--light); border-left: 2px solid var(--light);
   border-right: 2px solid var(--darker); border-bottom: 2px solid var(--darker);
   cursor: pointer;
   white-space: nowrap;
-  line-height: 1.3;
+  min-width: 84px;
+  text-align: center;
+  flex-shrink: 0;
 }
+.btn-login-big .lock-ico { font-size: 22px; line-height: 1; }
 .btn-login-big:active {
   border-top: 2px solid var(--darker); border-left: 2px solid var(--darker);
   border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
-  padding: 11px 17px 9px 19px;
+  padding: 13px 15px 11px 17px;
 }
 
 .win-btn {
@@ -505,52 +487,35 @@ html, body {
         <div class="led-sub" id="ledSub">dias &nbsp;·&nbsp; horas &nbsp;·&nbsp; minutos &nbsp;·&nbsp; segundos</div>
       </div>
 
-      <!-- Present button — only visible when countdown = 0 -->
-      <div style="text-align:center" id="presentBtnWrap">
-        <button class="win-btn" id="presentBtn" onclick="openLogin()">
-          🎁 ABRIR MEU PRESENTE
-        </button>
-      </div>
-    </div>
-
-    <!-- LOGIN SUB-WINDOW — appears inside main window when countdown ends -->
-    <div id="loginSubWin">
-      <!-- Sub-window title bar -->
-      <div class="tbar">
-        <span class="tbar-icon">🔒</span>
-        <span class="tbar-text">ACESSAR MEMÓRIAS SECRETAS</span>
-        <div class="tbar-btns">
-          <div class="tbtn">✕</div>
-        </div>
-      </div>
-
-      <div class="login-sub-body">
-        <!-- Under Construction icon -->
-        <div class="under-col">
-          <div class="under-sign">🚧</div>
-          <div class="under-txt">UNDER<br>CONSTRUCTION</div>
-        </div>
-
-        <!-- Form fields -->
-        <div class="login-form-col">
-          <div class="lfield">
-            <label>CPF (Somente números):</label>
-            <input type="text" id="cpfInput" maxlength="11" inputmode="numeric" autocomplete="off"/>
-          </div>
-          <div class="lfield">
-            <label>SENHA (Data de Namoro DD/MM/AAAA):</label>
-            <input type="password" id="senhaInput"/>
-          </div>
-        </div>
-
-        <!-- Big LOGIN button -->
-        <div class="login-btn-col">
-          <button class="btn-login-big" onclick="doLogin()">LOGIN 🔐</button>
-        </div>
-      </div>
     </div>
 
   </div><!-- /mainWin -->
+
+  <!-- ═══ LOGIN MODAL — aparece automaticamente quando contador zera ═══ -->
+  <div class="w95" id="loginModal">
+    <div class="tbar">
+      <span class="tbar-icon">🎁</span>
+      <span class="tbar-text">ACESSE SEU PRESENTE</span>
+      <div class="tbar-btns">
+        <div class="tbtn" onclick="document.getElementById('loginModal').style.display='none'">✕</div>
+      </div>
+    </div>
+    <div class="lm-body">
+      <div class="lm-fields">
+        <div class="lfield">
+          <label>Usuário:</label>
+          <input type="text" id="uInput" autocomplete="off" placeholder="seu nome..."/>
+        </div>
+        <div class="lfield">
+          <label>Senha:</label>
+          <input type="password" id="pInput" placeholder="••••••••••"/>
+        </div>
+      </div>
+      <button class="btn-login-big" onclick="doLogin()">
+        LOGIN<span class="lock-ico">🔐</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ═══ ERROR DIALOG ═══ -->
   <div class="w95" id="errDialog">
@@ -646,8 +611,8 @@ html, body {
 //  CONFIG — edite aqui
 // ════════════════════════════════════
 const TARGET   = new Date('2026-03-19T00:00:00');
-const CPF_OK   = '45174836818';   // somente números
-const SENHA_OK = '26/10/2025';
+const USERNAME = 'larissa';
+const PASSWORD = '26/10/2025';
 
 const PHOTOS = [
   { emoji:'🌟', label:'Nossa primeira vez' },
@@ -691,14 +656,15 @@ function tick() {
   const diff = TARGET - new Date();
   if (diff <= 0) {
     done = true;
+    // Countdown ended — show login modal
     document.getElementById('ledNum').textContent = '🎂  CHEGOU O DIA!  🎂';
     document.getElementById('ledSub').textContent = 'O TRINTOU DA LARI CHEGOU!';
-    // Hide present button, show login sub-window directly
-    document.getElementById('presentBtnWrap').style.display = 'none';
-    document.getElementById('loginSubWin').style.display = 'block';
-    setTimeout(() => document.getElementById('cpfInput').focus(), 100);
     clearInterval(timer);
     boom('all');
+    setTimeout(() => {
+      document.getElementById('loginModal').style.display = 'block';
+      setTimeout(() => document.getElementById('uInput').focus(), 50);
+    }, 1200);
     return;
   }
   const d = Math.floor(diff / 86400000);
@@ -716,25 +682,19 @@ function focusMain() {
   document.getElementById('mainWin').style.display = 'block';
 }
 
-// openLogin kept for present button (won't be used since counter zeroes first)
-function openLogin() {
-  document.getElementById('presentBtnWrap').style.display = 'none';
-  document.getElementById('loginSubWin').style.display = 'block';
-  setTimeout(() => document.getElementById('cpfInput').focus(), 50);
-}
-
 function doLogin() {
-  const cpf   = document.getElementById('cpfInput').value.replace(/\D/g,'');
-  const senha = document.getElementById('senhaInput').value.trim();
-  if (cpf === CPF_OK && senha === SENHA_OK) {
-    window.location.href = 'surpresa.html';
+  const u = document.getElementById('uInput').value.trim();
+  const p = document.getElementById('pInput').value.trim();
+  if (u === 'Larissa' && p === PASSWORD) {
+    document.getElementById('loginModal').style.display = 'none';
+    window.location.href = 'presente.html';
   } else {
     document.getElementById('errDialog').style.display = 'block';
   }
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
+  if (e.key === 'Enter' && document.getElementById('loginModal').style.display === 'block') doLogin();
 });
 
 // Birthday
