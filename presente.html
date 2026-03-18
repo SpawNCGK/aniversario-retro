@@ -463,41 +463,35 @@ html, body {
 
 </div><!-- /desktop -->
 
-<!-- ═══ YOUTUBE WINDOW ═══ -->
-<div class="w95" id="ytWindow" style="
-  bottom: 44px; right: 16px;
-  width: 320px; z-index: 50;
-  display: none;
-">
+<!-- ═══ MUSIC WINDOW ═══ -->
+<div class="w95" id="ytWindow" style="bottom:44px;right:16px;width:260px;z-index:50;display:none;">
   <div class="tbar">
-    <span class="tbar-icon">▶️</span>
-    <span class="tbar-text">Parabéns da Xuxa — YouTube</span>
+    <span class="tbar-icon">🎵</span>
+    <span class="tbar-text">Parabéns da Xuxa — Xuxa</span>
     <div class="tbar-btns">
       <div class="tbtn" onclick="toggleYT()">_</div>
       <div class="tbtn">□</div>
       <div class="tbtn" onclick="toggleYT()">✕</div>
     </div>
   </div>
-  <div style="padding:4px; background:#000;">
-    <iframe
-      id="ytFrame"
-      width="312" height="176"
-      src="https://www.youtube.com/embed/CvDSS5tFG6I?autoplay=1&loop=1&playlist=CvDSS5tFG6I"
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      allowfullscreen
-      style="display:block;"
-    ></iframe>
-  </div>
-  <div style="
-    background:var(--face);
-    border-top:1px solid var(--dark);
-    padding:2px 6px;
-    font-size:10px;
-    display:flex; align-items:center; gap:4px;
-  ">
-    <span>🎵</span>
-    <span style="animation:blink 1s step-end infinite">▶ Reproduzindo...</span>
+  <div style="padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:28px">🎵</span>
+      <div>
+        <div style="font-weight:bold;font-size:11px;">Parabéns da Xuxa</div>
+        <div style="font-size:10px;color:var(--darker);">Xuxa</div>
+      </div>
+    </div>
+    <div style="font-size:10px;display:flex;align-items:center;gap:4px;animation:blink 1s step-end infinite">
+      ▶ Reproduzindo...
+    </div>
+    <div style="display:flex;gap:4px;justify-content:center;">
+      <button onclick="toggleMute()" id="muteBtn" style="
+        padding:3px 10px;background:var(--face);font-size:11px;cursor:pointer;
+        border-top:2px solid var(--light);border-left:2px solid var(--light);
+        border-right:2px solid var(--darker);border-bottom:2px solid var(--darker);
+      ">🔊 Som</button>
+    </div>
   </div>
 </div>
 
@@ -560,6 +554,14 @@ if (music) {
   music.play().catch(() => {
     document.addEventListener('click', () => music.play(), { once: true });
   });
+}
+
+// Mute toggle
+let muted = false;
+function toggleMute() {
+  muted = !muted;
+  music.muted = muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔇 Mudo' : '🔊 Som';
 }
 
 // Auto confetti on load
