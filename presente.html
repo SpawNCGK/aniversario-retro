@@ -521,13 +521,6 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Autoplay music (some browsers block it — we retry on first click)
-const music = document.getElementById('bgMusic');
-music.volume = 0.6;
-music.play().catch(() => {
-  document.addEventListener('click', () => music.play(), { once: true });
-});
-
 // Confetti
 function boom(type) {
   const o = { particleCount:120, spread:80, origin:{y:0.6} };
